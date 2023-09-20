@@ -1,44 +1,31 @@
-#include "shell.h"
+#include "main.h"
 
 /**
- * main - entry point
- * @ac: arg count
- * @av: arg vector
- *
- * Return: 0 on success, 1 on error
+ * main - starting point of the program
+ * @argc: number of command-line arguments
+ * @argv: an array of pointers to the command-line arguments.
+ * Return: 0  on Success
  */
-int main(int ac, char **av)
+int main(int argc, char *argv[])
 {
-	info_t info[] = { INFO_INIT };
-	int fd = 2;
+	char *line = NULL;
+	ssize_t gerror = 0;
+	size_t size = 0;
 
-	asm ("mov %1, %0\n\t"
-		"add $3, %0"
-		: "=r" (fd)
-		: "r" (fd));
+	(void)argc;
 
-	if (ac == 2)
+	while (1)
 	{
-		fd = open(av[1], O_RDONLY);
-		if (fd == -1)
+		line = NULL;
+		gerror = getline(&line, &size, stdin);
+		if (gerror == -1)
 		{
-			if (errno == EACCES)
-				exit(126);
-			if (errno == ENOENT)
-			{
-				_eputs(av[0]);
-				_eputs(": 0: Can't open ");
-				_eputs(av[1]);
-				_eputchar('\n');
-				_eputchar(BUF_FLUSH);
-				exit(127);
-			}
-			return (EXIT_FAILURE);
+			free(line);
+			exit(0);
 		}
-		info->readfd = fd;
+		input_controller(&line, argv[0]);
+		free(line);
 	}
-	populate_env_list(info);
-	read_history(info);
-	hsh(info, av);
-	return (EXIT_SUCCESS);
+	return (0);
 }
+
