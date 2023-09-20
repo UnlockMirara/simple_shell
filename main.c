@@ -1,5 +1,4 @@
 #include "main.h"
-
 /**
  * main - starting point of the program
  * @argc: number of command-line arguments
